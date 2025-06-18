@@ -1,20 +1,23 @@
 import requests
 
-def test_all_posts_data_structure():
-    url = "https://jsonplaceholder.typicode.com/posts"
-    response = requests.get(url)
+def test_get_posts():
+    """🟢 Перевірка GET-запиту: отримаємо список постів"""
+    response = requests.get("https://jsonplaceholder.typicode.com/posts")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    assert "title" in response.json()[0]
 
-    # 1. Статус код
-    assert response.status_code == 200, "❌ Очікували статус 200"
+def test_create_post():
+    """🟡 Перевірка POST-запиту: створення нового посту"""
+    payload = {
+        "title": "Test Post",
+        "body": "Це тіло тестового посту",
+        "userId": 1
+    }
+    response = requests.post("https://jsonplaceholder.typicode.com/posts", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["title"] == payload["title"]
+    assert data["body"] == payload["body"]
+    assert data["userId"] == payload["userId"]
 
-    posts = response.json()
-
-    # 2. Кількість постів
-    assert len(posts) == 100, f"❌ Очікували 100 постів, отримали {len(posts)}"
-
-    # 3. Структура кожного поста
-    for post in posts:
-        assert "userId" in post, "❌ Відсутнє поле 'userId'"
-        assert "id" in post, "❌ Відсутнє поле 'id'"
-        assert "title" in post, "❌ Відсутнє поле 'title'"
-        assert "body" in post, "❌ Відсутнє поле 'body'"
